@@ -1,0 +1,413 @@
+﻿@model Tradetool.Models.DashboardData
+@using System.Text.Json
+
+@{
+    ViewData["Title"] = "Team Analysis";
+}
+
+<style>
+    body {
+        background: #0f1123;
+        color: #fff;
+        font-family: 'Segoe UI', Arial;
+        margin: 0;
+        padding: 20px;
+    }
+
+    h2 {
+        margin-bottom: 20px;
+        font-weight: 600;
+    }
+
+    /* =========================
+       FILTROS
+    ========================= */
+    .filters {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 25px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .filters input,
+    .filters button {
+        background: #1a1c33;
+        border: 1px solid #2d325a;
+        color: white;
+        padding: 10px 14px;
+        border-radius: 10px;
+        font-size: 14px;
+    }
+
+    .filters button {
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .filters button:hover {
+        background: #2d325a;
+    }
+
+    /* =========================
+       TEAM HEADER
+    ========================= */
+    .team-header {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+        margin-bottom: 25px;
+    }
+
+    .team-header img {
+        width: 60px;
+        height: 60px;
+        object-fit: contain;
+    }
+
+    .team-name {
+        font-size: 28px;
+        font-weight: 700;
+    }
+
+    /* =========================
+       KPI
+    ========================= */
+    .kpi-container {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 20px;
+        margin-bottom: 25px;
+    }
+
+    .kpi {
+        background: #1a1c33;
+        border-radius: 14px;
+        padding: 18px;
+        text-align: center;
+    }
+
+    .kpi h4 {
+        font-size: 13px;
+        color: #8b90b5;
+        margin-bottom: 8px;
+    }
+
+    .kpi-value {
+        font-size: 24px;
+        font-weight: 700;
+    }
+
+    .positive {
+        color: #22c55e;
+    }
+
+    .negative {
+        color: #ef4444;
+    }
+
+    /* =========================
+       CHART
+    ========================= */
+    .chart-container {
+        background: #1a1c33;
+        border-radius: 14px;
+        padding: 20px;
+        margin-bottom: 30px;
+    }
+
+    /* =========================
+       GRID
+    ========================= */
+    .grid-dashboard {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 20px;
+    }
+
+    .card {
+        background: #1a1c33;
+        border-radius: 14px;
+        padding: 18px;
+    }
+
+    .card h3 {
+        margin-bottom: 15px;
+        font-size: 15px;
+    }
+
+    /* =========================
+       ITENS ALINHADOS
+    ========================= */
+    .item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 10px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid #2a2d4a;
+        font-size: 15px;
+    }
+
+    .item:last-child {
+        border-bottom: none;
+    }
+
+    .name {
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        padding-right: 10px;
+        font-size: 15px;
+        font-weight: 600;
+    }
+
+    .value {
+        min-width: 95px;
+        text-align: right;
+        font-weight: 700;
+        white-space: nowrap;
+        flex-shrink: 0;
+        font-size: 15px;
+    }
+</style>
+
+<h2>📊 Team Analysis</h2>
+
+<!-- FILTRO -->
+<form method="get" class="filters">
+
+    <input
+        type="text"
+        id="teamInput"
+        name="team"
+        placeholder="Digite um time..."
+        autocomplete="off"
+        value="@Context.Request.Query["team"]"
+    />
+
+    <button type="submit">
+        Buscar
+    </button>
+
+</form>
+
+<!-- TEAM -->
+@if (!string.IsNullOrEmpty(Context.Request.Query["team"]))
+{
+    var team = Context.Request.Query["team"].ToString();
+
+    <div class="team-header">
+
+        <img src="/img/teams/@(team).png"
+             onerror="this.style.display='none'" />
+
+        <div class="team-name">
+            @team
+        </div>
+
+    </div>
+}
+
+<!-- KPI -->
+<div class="kpi-container">
+
+    <div class="kpi">
+        <h4>Lucro</h4>
+
+        <div class="kpi-value @(Model.LucroTotal >= 0 ? "positive" : "negative")">
+            R$ @Model.LucroTotal.ToString("N2")
+        </div>
+    </div>
+
+    <div class="kpi">
+        <h4>ROI</h4>
+
+        <div class="kpi-value @(Model.ROI >= 0 ? "positive" : "negative")">
+            @Model.ROI.ToString("N2") %
+        </div>
+    </div>
+
+    <div class="kpi">
+        <h4>Winrate</h4>
+
+        <div class="kpi-value">
+            @Model.Winrate.ToString("N2") %
+        </div>
+    </div>
+
+    <div class="kpi">
+        <h4>Trades</h4>
+
+        <div class="kpi-value">
+            @Model.TotalTrades
+        </div>
+    </div>
+
+    <div class="kpi">
+        <h4>Médio</h4>
+
+        <div class="kpi-value @(Model.LucroMedio >= 0 ? "positive" : "negative")">
+            R$ @Model.LucroMedio.ToString("N2")
+        </div>
+    </div>
+
+</div>
+
+<!-- CHART -->
+<div class="chart-container">
+    <canvas id="chart"></canvas>
+</div>
+
+<!-- GRID -->
+<div class="grid-dashboard">
+
+    <!-- MÉTODO + ODDS -->
+    <div class="card">
+
+        <h3>🎯 Método + Odds</h3>
+
+        @foreach (var item in Model.MethodsOdds)
+        {
+            <div class="item @(item.Valor >= 0 ? "positive" : "negative")">
+
+                <div class="name">
+                    @item.Nome
+                </div>
+
+                <div class="value">
+                    R$ @item.Valor.ToString("N2")
+                </div>
+
+            </div>
+        }
+
+    </div>
+
+    <!-- MELHOR MÉTODO -->
+    <div class="card">
+
+        <h3>🧠 Melhor método</h3>
+
+        @foreach (var item in Model.BestMethodsPerTeam)
+        {
+            <div style="margin-bottom:15px; border-bottom:1px solid #2d325a; padding-bottom:10px;">
+
+                <div class="positive" style="font-weight:bold; margin-bottom:10px;">
+                    @item.Team
+                </div>
+
+                <div class="item">
+                    <div class="name">Método</div>
+                    <div class="value">@item.Method</div>
+                </div>
+
+                <div class="item">
+                    <div class="name">ROI</div>
+
+                    <div class="value @(item.ROI >= 0 ? "positive" : "negative")">
+                        @item.ROI.ToString("N2") %
+                    </div>
+                </div>
+
+                <div class="item">
+                    <div class="name">Lucro</div>
+
+                    <div class="value @(item.Lucro >= 0 ? "positive" : "negative")">
+                        R$ @item.Lucro.ToString("N2")
+                    </div>
+                </div>
+
+                <div class="item">
+                    <div class="name">Trades</div>
+
+                    <div class="value">
+                        @item.Trades
+                    </div>
+                </div>
+
+                <div class="item">
+                    <div class="name">Winrate</div>
+
+                    <div class="value">
+                        @item.Winrate.ToString("N2") %
+                    </div>
+                </div>
+
+            </div>
+        }
+
+    </div>
+
+</div>
+
+<!-- CHART -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const labels = @Html.Raw(JsonSerializer.Serialize(Model.Evolucao.Select(x => x.Data)));
+    const values = @Html.Raw(JsonSerializer.Serialize(Model.Evolucao.Select(x => x.Saldo)));
+
+    new Chart(document.getElementById("chart"), {
+        type: 'line',
+
+        data: {
+            labels: labels,
+
+            datasets: [{
+                label: 'Saldo',
+
+                data: values,
+
+                borderWidth: 2,
+                tension: 0.3
+            }]
+        }
+    });
+</script>
+
+<!-- AUTOCOMPLETE -->
+<script>
+    let teams = [];
+
+    fetch('/Bet/GetTeams')
+        .then(r => r.json())
+        .then(data => teams = data);
+
+    const input = document.getElementById('teamInput');
+
+    input.addEventListener('input', function () {
+
+        const value = this.value.toLowerCase();
+
+        const list = teams.filter(x =>
+            x.toLowerCase().includes(value)
+        );
+
+        let datalist = document.getElementById('teams-list');
+
+        if (!datalist) {
+            datalist = document.createElement('datalist');
+            datalist.id = 'teams-list';
+
+            document.body.appendChild(datalist);
+
+            input.setAttribute('list', 'teams-list');
+        }
+
+        datalist.innerHTML = '';
+
+        list.slice(0, 10).forEach(team => {
+
+            const option = document.createElement('option');
+
+            option.value = team;
+
+            datalist.appendChild(option);
+        });
+    });
+</script>

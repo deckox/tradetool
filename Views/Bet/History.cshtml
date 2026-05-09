@@ -1,0 +1,177 @@
+﻿@model List<Tradetool.Models.BetRecordData>
+
+@{
+    ViewData["Title"] = "History";
+}
+
+<style>
+    body {
+        background: #0f1123;
+        color: white;
+        font-family: 'Segoe UI';
+    }
+
+    .top-bar {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+
+    input, select, button {
+        background: #1a1c33;
+        border: 1px solid #2d325a;
+        color: white;
+        padding: 10px;
+        border-radius: 8px;
+    }
+
+    button {
+        cursor: pointer;
+        font-weight: 600;
+    }
+
+    .table-container {
+        overflow-x: auto;
+        background: #1a1c33;
+        border-radius: 12px;
+        padding: 10px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 1300px;
+    }
+
+    th {
+        background: #252848;
+        padding: 12px;
+        text-align: left;
+        font-size: 13px;
+    }
+
+    td {
+        padding: 10px;
+        border-top: 1px solid #2a2f52;
+        font-size: 13px;
+        white-space: nowrap;
+    }
+
+    tr:hover {
+        background: #202443;
+    }
+
+    .positive {
+        color: #22c55e;
+        font-weight: 700;
+    }
+
+    .negative {
+        color: #ef4444;
+        font-weight: 700;
+    }
+
+    h2 {
+        margin-bottom: 20px;
+    }
+</style>
+
+<h2>📜 Histórico de Trades</h2>
+
+<form method="get">
+
+    <div class="top-bar">
+
+        <select name="period">
+            <option value="">Todos</option>
+
+            <option value="week"
+                    selected="@(ViewBag.Period == "week")">
+                Últimos 7 dias
+            </option>
+        </select>
+
+        <input type="month"
+               name="month"
+               value="@ViewBag.Month" />
+
+        <input type="date"
+               name="startDate"
+               value="@ViewBag.StartDate" />
+
+        <input type="date"
+               name="endDate"
+               value="@ViewBag.EndDate" />
+
+        <button type="submit">
+            Filtrar
+        </button>
+
+    </div>
+
+</form>
+
+<div class="table-container">
+
+    <table>
+
+        <thead>
+            <tr>
+                <th>Data</th>
+                <th>Home</th>
+                <th>Away</th>
+                <th>Competição</th>
+                <th>Mercado</th>
+                <th>Método</th>
+                <th>Side</th>
+                <th>Odds</th>
+                <th>Stake</th>
+                <th>PL</th>
+                <th>Comentário</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            @foreach (var item in Model)
+            {
+                <tr>
+
+                    <td>
+                        @item.Date.ToString("dd/MM/yyyy HH:mm")
+                    </td>
+
+                    <td>@item.Home</td>
+
+                    <td>@item.Away</td>
+
+                    <td>@item.Competition</td>
+
+                    <td>@item.Market</td>
+
+                    <td>@item.Methods</td>
+
+                    <td>@item.Side</td>
+
+                    <td>@item.Odds</td>
+
+                    <td>
+                        R$ @item.Stake?.ToString("N2")
+                    </td>
+
+                    <td class="@(item.PL >= 0 ? "positive" : "negative")">
+                        R$ @item.PL?.ToString("N2")
+                    </td>
+
+                    <td>@item.Comments</td>
+
+                </tr>
+            }
+
+        </tbody>
+
+    </table>
+
+</div>

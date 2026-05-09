@@ -1,0 +1,305 @@
+﻿@model Tradetool.Models.DashboardData
+@using System.Text.Json
+
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<style>
+    body {
+        background: #0f1123;
+        color: #fff;
+        font-family: 'Segoe UI', Arial;
+        margin: 0;
+        padding: 20px;
+    }
+
+    h2 {
+        margin-bottom: 20px;
+        font-weight: 600;
+    }
+
+    /* ===== KPI LINHA ÚNICA ===== */
+    .kpi-container {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 20px;
+        margin-bottom: 25px;
+    }
+
+    .kpi {
+        text-align: center;
+    }
+
+        .kpi h4 {
+            font-size: 13px;
+            color: #8b90b5;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+    .kpi-value {
+        font-size: 22px;
+        font-weight: 700;
+    }
+
+    .positive {
+        color: #22c55e;
+    }
+
+    .negative {
+        color: #ef4444;
+    }
+
+    /* ===== GRÁFICO ===== */
+    .chart-container {
+        width: 500px;
+        margin-bottom: 30px;
+    }
+
+    /* ===== GRID ===== */
+    .grid-dashboard {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 20px;
+    }
+
+    .card {
+        background: #1a1c33;
+        border-radius: 12px;
+        padding: 16px;
+    }
+
+        .card h3 {
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+    .title-green {
+        color: #22c55e;
+    }
+
+    .title-red {
+        color: #ef4444;
+    }
+
+    /* ===== ITENS SEM QUEBRA ===== */
+    .item {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        align-items: center;
+        font-size: 13px;
+        margin-bottom: 5px;
+    }
+
+    .name {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .value {
+        font-weight: 600;
+        white-space: nowrap;
+    }
+</style>
+
+<form method="get" style="margin-bottom:15px; display:flex; gap:10px; align-items:center;">
+
+    <input type="text"
+           name="team"
+           placeholder="Filtrar por time..."
+           value="@Context.Request.Query["team"]"
+           style="padding:6px 10px; border-radius:6px; border:none; outline:none;" />
+
+    <input type="month"
+           name="month"
+           value="@Context.Request.Query["month"]"
+           style="padding:6px 10px; border-radius:6px; border:none; outline:none;" />
+
+    <button type="submit"
+            style="padding:6px 12px; border-radius:6px; border:none; background:#22c55e; color:white; cursor:pointer;">
+        Filtrar
+    </button>
+
+    <a href="/Bet/Dashboard"
+       style="padding:6px 12px; border-radius:6px; background:#ef4444; color:white; text-decoration:none;">
+        Limpar
+    </a>
+
+</form>
+
+<h2>📊 Dashboard</h2>
+
+<!-- KPI -->
+<div class="kpi-container">
+    <div class="kpi">
+        <h4>Lucro</h4>
+        <div class="kpi-value @(Model.LucroTotal >= 0 ? "positive" : "negative")">
+            R$ @Model.LucroTotal.ToString("N2")
+        </div>
+    </div>
+
+    <div class="kpi">
+        <h4>ROI</h4>
+        <div class="kpi-value @(Model.ROI >= 0 ? "positive" : "negative")">
+            @Model.ROI.ToString("N2") %
+        </div>
+    </div>
+
+    <div class="kpi">
+        <h4>Winrate</h4>
+        <div class="kpi-value">
+            @Model.Winrate.ToString("N2") %
+        </div>
+    </div>
+
+    <div class="kpi">
+        <h4>Trades</h4>
+        <div class="kpi-value">
+            @Model.TotalTrades
+        </div>
+    </div>
+
+    <div class="kpi">
+        <h4>Médio</h4>
+        <div class="kpi-value @(Model.LucroMedio >= 0 ? "positive" : "negative")">
+            R$ @Model.LucroMedio.ToString("N2")
+        </div>
+    </div>
+</div>
+
+<!-- GRÁFICO -->
+<div class="chart-container">
+    <canvas id="chart"></canvas>
+</div>
+
+<!-- GRID -->
+<div class="grid-dashboard">
+
+    <!-- TIMES -->
+    <div class="card">
+        <h3 class="title-green">Times lucro</h3>
+        @foreach (var item in Model.RankingTeams)
+        {
+            <div class="item positive">
+                <div class="name">@item.Nome</div>
+                <div class="value">R$ @item.Valor.ToString("N2")</div>
+            </div>
+        }
+    </div>
+
+    <div class="card">
+        <h3 class="title-red">Times prejuízo</h3>
+        @foreach (var item in Model.RankingTeamsLoss)
+        {
+            <div class="item negative">
+                <div class="name">@item.Nome</div>
+                <div class="value">R$ @item.Valor.ToString("N2")</div>
+            </div>
+        }
+    </div>
+
+    <!-- COMPETIÇÕES -->
+    <div class="card">
+        <h3 class="title-green">Competições lucro</h3>
+        @foreach (var item in Model.RankingCompetitions)
+        {
+            <div class="item positive">
+                <div class="name">@item.Nome</div>
+                <div class="value">R$ @item.Valor.ToString("N2")</div>
+            </div>
+        }
+    </div>
+
+    <div class="card">
+        <h3 class="title-red">Competições prejuízo</h3>
+        @foreach (var item in Model.RankingCompetitionsLoss)
+        {
+            <div class="item negative">
+                <div class="name">@item.Nome</div>
+                <div class="value">R$ @item.Valor.ToString("N2")</div>
+            </div>
+        }
+    </div>
+
+    <!-- MÉTODOS -->
+    <div class="card">
+        <h3 class="title-green">Métodos lucro</h3>
+        @foreach (var item in Model.RankingMethods)
+        {
+            <div class="item positive">
+                <div class="name">@item.Nome</div>
+                <div class="value">R$ @item.Valor.ToString("N2")</div>
+            </div>
+        }
+    </div>
+
+    <div class="card">
+        <h3 class="title-red">Métodos prejuízo</h3>
+        @foreach (var item in Model.RankingMethodsLoss)
+        {
+            <div class="item negative">
+                <div class="name">@item.Nome</div>
+                <div class="value">R$ @item.Valor.ToString("N2")</div>
+            </div>
+        }
+    </div>
+
+    <!-- MÉTODO + ODDS -->
+    <div class="card">
+        <h3>Método + Odds</h3>
+        @foreach (var item in Model.MethodsOdds)
+        {
+            <div class="item @(item.Valor >= 0 ? "positive" : "negative")">
+                <div class="name">@item.Nome</div>
+                <div class="value">R$ @item.Valor.ToString("N2")</div>
+            </div>
+        }
+    </div>
+
+    <!-- ODDS -->
+    <div class="card">
+        <h3>Odds</h3>
+        @foreach (var item in Model.OddsAnalysis)
+        {
+            <div class="item @(item.Resultado >= 0 ? "positive" : "negative")">
+                <div class="name">@item.Range</div>
+                <div class="value">R$ @item.Resultado.ToString("N2")</div>
+            </div>
+        }
+    </div>
+
+    <div class="card">
+        <h3>ROI Odds</h3>
+        @foreach (var item in Model.OddsROI)
+        {
+            <div class="item @(item.Resultado >= 0 ? "positive" : "negative")">
+                <div class="name">@item.Range</div>
+                <div class="value">@item.Resultado.ToString("N2") %</div>
+            </div>
+        }
+    </div>
+
+</div>
+
+<!-- CHART -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const labels = @Html.Raw(JsonSerializer.Serialize(Model.Evolucao.Select(x => x.Data)));
+    const values = @Html.Raw(JsonSerializer.Serialize(Model.Evolucao.Select(x => x.Saldo)));
+
+    new Chart(document.getElementById("chart"), {
+    type: 'line',
+    data: {
+    labels: labels,
+    datasets: [{
+    label: 'Saldo (R$)',
+    data: values,
+    borderWidth: 2,
+    tension: 0.3
+    }]
+    }
+    });
+</script>

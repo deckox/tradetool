@@ -1,0 +1,208 @@
+﻿<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Tradetool</title>
+
+    <style>
+            body {
+                margin: 0;
+                font-family: 'Segoe UI', sans-serif;
+                background: #1e1e2f;
+                color: #fff;
+                display: flex;
+                min-height: 100vh;
+            }
+
+            /* SIDEBAR */
+            .sidebar {
+                width: 220px;
+                background: #151521;
+                padding: 20px;
+                box-sizing: border-box;
+            }
+
+                .sidebar h2 {
+                    margin-bottom: 30px;
+                    font-size: 20px;
+                }
+
+                .sidebar a {
+                    display: block;
+                    color: #ccc;
+                    text-decoration: none;
+                    margin: 10px 0;
+                    padding: 10px;
+                    border-radius: 6px;
+                    transition: 0.2s;
+                }
+
+                    .sidebar a:hover {
+                        background: #2a2a3d;
+                        color: #fff;
+                    }
+
+            /* MAIN */
+            .main {
+                flex: 1;
+                padding: 30px;
+                background: #1e1e2f;
+            }
+
+            /* CARD */
+            .card {
+                background: #2a2a3d;
+                padding: 25px;
+                border-radius: 12px;
+                box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            }
+
+            /* GRID KPI */
+            .grid {
+                display: grid;
+                grid-template-columns: repeat(5, 1fr);
+                gap: 15px;
+                margin-top: 20px;
+            }
+
+            .kpi {
+                background: #24243a;
+                padding: 20px;
+                border-radius: 10px;
+                text-align: center;
+            }
+
+                .kpi span {
+                    color: #aaa;
+                    font-size: 13px;
+                }
+
+                .kpi h3 {
+                    margin-top: 10px;
+                    font-size: 22px;
+                }
+
+            /* CORES */
+            .profit {
+                color: #2ecc71;
+                font-weight: bold;
+            }
+
+            .loss {
+                color: #e74c3c;
+                font-weight: bold;
+            }
+
+            .back {
+                color: #3498db;
+                font-weight: bold;
+            }
+
+            .lay {
+                color: #f39c12;
+                font-weight: bold;
+            }
+
+            /* BOTÃO */
+            .btn-primary {
+                background: #4f8cff;
+                border: none;
+                padding: 12px 25px;
+                border-radius: 8px;
+                color: white;
+                cursor: pointer;
+                font-size: 15px;
+                transition: 0.2s;
+            }
+
+                .btn-primary:hover {
+                    background: #3b6fd6;
+                }
+
+            /* UPLOAD */
+            .file-upload {
+                display: block;
+                border: 2px dashed #555;
+                padding: 20px;
+                border-radius: 10px;
+                cursor: pointer;
+                margin: 20px 0;
+                transition: 0.2s;
+                text-align: center;
+            }
+
+                .file-upload:hover {
+                    background: #2a2a3d;
+                }
+
+            /* PROGRESS */
+            .progress-wrapper {
+                margin-top: 20px;
+                width: 100%;
+                background: #444;
+                border-radius: 20px;
+                overflow: hidden;
+            }
+
+            .progress-bar {
+                width: 0%;
+                height: 25px;
+                background: linear-gradient(90deg, #2ecc71, #27ae60);
+                text-align: center;
+                line-height: 25px;
+                font-weight: bold;
+                transition: width 0.3s;
+            }
+
+            /* TABELA */
+            .bet-table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 20px;
+                font-size: 14px;
+            }
+
+                .bet-table thead {
+                    background: #1a1a2e;
+                }
+
+                .bet-table th {
+                    text-align: left;
+                    padding: 12px;
+                    color: #aaa;
+                    border-bottom: 1px solid #333;
+                }
+
+                .bet-table td {
+                    padding: 12px;
+                    border-bottom: 1px solid #2f2f45;
+                }
+
+                .bet-table tbody tr:nth-child(even) {
+                    background: #24243a;
+                }
+
+                .bet-table tbody tr:hover {
+                    background: #32324d;
+                }
+    </style>
+</head>
+
+<body>
+
+    <div class="sidebar">
+        <h2>📊 Tradetool</h2>
+
+        <a href="/Bet/Import">📥 Importar</a>
+        <a href="/Bet/History">📜 Histórico</a>
+        <a href="/Bet/TeamAnalysis">🔍 Análise por Time</a>
+        <a href="/Bet/Dashboard">📊 Dashboard</a>
+    </div>
+
+    <div class="main">
+        @RenderBody()
+    </div>
+
+</body>
+</html>
