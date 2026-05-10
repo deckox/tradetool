@@ -9,9 +9,9 @@ namespace Tradetool.Core
 
         private const string Sql_Insert = @"
         INSERT INTO BetHistory 
-        (Date, Stake, Responsability, PL, PLStake, Home, Away, Competition, Market, Methods, Side, Odds, Amount, BalanceAfter, Comments, BetId)
+        (Date, Stake, Responsability, PL, PLStake, Home, Away, Competition, Market, Methods, Side, Odds, Amount, BalanceAfter, Comments, BetId, TargetTeam)
         VALUES 
-        (@Date, @Stake, @Responsability, @PL, @PLStake, @Home, @Away, @Competition, @Market, @Methods, @Side, @Odds, @Amount, @BalanceAfter, @Comments, @BetId)
+        (@Date, @Stake, @Responsability, @PL, @PLStake, @Home, @Away, @Competition, @Market, @Methods, @Side, @Odds, @Amount, @BalanceAfter, @Comments, @BetId, @TargetTeam)
         ON CONFLICT(BetId) DO NOTHING;";
 
         private const string Sql_Update = @"
@@ -31,7 +31,8 @@ namespace Tradetool.Core
             Amount = @Amount,
             BalanceAfter = @BalanceAfter,
             Comments = @Comments,
-            BetId = @BetId
+            BetId = @BetId,
+            TargetTeam = @TargetTeam
         WHERE Id = @Id";
 
         private const string Sql_Delete = "DELETE FROM BetHistory WHERE Id = @Id";
@@ -74,6 +75,7 @@ namespace Tradetool.Core
             command.Parameters.AddWithValue("@BalanceAfter", bet.BalanceAfter);
             command.Parameters.AddWithValue("@Comments", bet.Comments?.Trim() ?? "");
             command.Parameters.AddWithValue("@BetId", bet.BetId);
+            command.Parameters.AddWithValue("@TargetTeam",bet.TargetTeam ?? "");
 
             return command.ExecuteNonQuery() > 0;
         }
@@ -164,24 +166,61 @@ namespace Tradetool.Core
             using var cmd = conn.CreateCommand();
 
             cmd.CommandText = @"
-            WITH Trades AS (
-                SELECT 
-                    Date,
-                    ROUND(
-                        CASE WHEN Side='LAY' THEN Stake ELSE 0 END -
-                        CASE WHEN Side='BACK' THEN Stake ELSE 0 END
-                    ,2) AS Resultado
-                FROM BetHistory
-                WHERE Home LIKE @team OR Away LIKE @team
-            )
+    WITH Trades AS (
 
-            SELECT 
-                strftime('%Y-%m-%d', Date),
-                ROUND(SUM(Resultado) OVER (ORDER BY Date),2)
+        SELECT
+            strftime('%Y-%m-%d %H:%M', Date) AS TradeDate,
 
-            FROM Trades";
+            Home,
+            Away,
+            Market,
+            Methods,
 
-            cmd.Parameters.AddWithValue("@team", "%" + team + "%");
+            ROUND(
+                SUM(
+                    CASE
+                        WHEN Side = 'LAY'
+                        THEN Stake
+                        ELSE 0
+                    END
+                )
+                -
+                SUM(
+                    CASE
+                        WHEN Side = 'BACK'
+                        THEN Stake
+                        ELSE 0
+                    END
+                )
+            ,2) AS Resultado
+
+        FROM BetHistory
+
+        WHERE
+            TargetTeam LIKE @team
+
+        GROUP BY
+            TradeDate,
+            Home,
+            Away,
+            Market,
+            Methods
+    )
+
+    SELECT
+        substr(TradeDate,1,10),
+
+        ROUND(
+            SUM(Resultado)
+            OVER (ORDER BY TradeDate)
+        ,2)
+
+    FROM Trades;
+    ";
+
+            cmd.Parameters.AddWithValue(
+                "@team",
+                "%" + team + "%");
 
             using var r = cmd.ExecuteReader();
 
@@ -190,7 +229,10 @@ namespace Tradetool.Core
                 list.Add(new SaldoEvolucao
                 {
                     Data = r.GetString(0),
-                    Saldo = r.GetDecimal(1)
+
+                    Saldo = r.IsDBNull(1)
+                        ? 0
+                        : r.GetDecimal(1)
                 });
             }
 
@@ -216,7 +258,7 @@ namespace Tradetool.Core
             LoadRanking(
                 connection,
                 data.RankingTeams,
-                "Home",
+                "TargetTeam",
                 filtro,
                 true
             );
@@ -224,7 +266,7 @@ namespace Tradetool.Core
             LoadRanking(
                 connection,
                 data.RankingTeamsLoss,
-                "Home",
+                "TargetTeam",
                 filtro,
                 false
             );
@@ -433,46 +475,111 @@ namespace Tradetool.Core
         #region METHODS ODDS
 
         private void LoadMethodsOdds(
-            SqliteConnection connection,
-            DashboardData data,
-            string filtro)
+    SqliteConnection connection,
+    DashboardData data,
+    string filtro)
         {
             using var cmd = connection.CreateCommand();
 
             cmd.CommandText = $@"
-            SELECT
-                Methods || ' | ' ||
 
-                CASE
-                    WHEN Odds < 2 THEN '1-2'
-                    WHEN Odds < 3 THEN '2-3'
-                    WHEN Odds < 5 THEN '3-5'
-                    ELSE '5+'
-                END,
+    WITH Trades AS (
 
-                ROUND(
-                    SUM(
-                        CASE WHEN Side='LAY' THEN Stake ELSE 0 END -
-                        CASE WHEN Side='BACK' THEN Stake ELSE 0 END
-                    )
-                ,2)
+        SELECT
 
-            FROM BetHistory
+            Home,
+            Away,
+            Methods,
+            Market,
+            Odds,
 
-            {filtro}
-            AND Methods IS NOT NULL
-            AND TRIM(Methods) <> ''
+            ROUND(
+                SUM(
+                    CASE
+                        WHEN Side='LAY'
+                        THEN Stake
+                        ELSE 0
+                    END
+                )
+                -
+                SUM(
+                    CASE
+                        WHEN Side='BACK'
+                        THEN Stake
+                        ELSE 0
+                    END
+                )
+            ,2) AS Resultado,
 
-            GROUP BY Methods,
             CASE
-                WHEN Odds < 2 THEN '1-2'
-                WHEN Odds < 3 THEN '2-3'
-                WHEN Odds < 5 THEN '3-5'
-                ELSE '5+'
-            END
 
-            ORDER BY 2 DESC
-            LIMIT 10";
+                -- CASA FAVORECIDA
+
+                WHEN (
+                    CAST(substr(Market,1,instr(Market,'-')-1) AS INTEGER)
+                    >
+                    CAST(substr(Market,instr(Market,'-')+1) AS INTEGER)
+                )
+                THEN Home
+
+                -- VISITANTE FAVORECIDO
+
+                WHEN (
+                    CAST(substr(Market,1,instr(Market,'-')-1) AS INTEGER)
+                    <
+                    CAST(substr(Market,instr(Market,'-')+1) AS INTEGER)
+                )
+                THEN Away
+
+                ELSE NULL
+
+            END AS TeamFavorecido
+
+        FROM BetHistory
+
+        {filtro}
+
+        AND Methods IS NOT NULL
+        AND TRIM(Methods) <> ''
+
+        GROUP BY
+            strftime('%Y-%m-%d %H:%M', Date),
+            Home,
+            Away,
+            Market,
+            Methods
+    )
+
+    SELECT
+
+        Methods || ' | ' ||
+
+        CASE
+            WHEN Odds < 2 THEN '1-2'
+            WHEN Odds < 3 THEN '2-3'
+            WHEN Odds < 5 THEN '3-5'
+            ELSE '5+'
+        END,
+
+        ROUND(SUM(Resultado),2)
+
+    FROM Trades
+
+    WHERE
+        TeamFavorecido IS NOT NULL
+
+    GROUP BY
+        Methods,
+
+        CASE
+            WHEN Odds < 2 THEN '1-2'
+            WHEN Odds < 3 THEN '2-3'
+            WHEN Odds < 5 THEN '3-5'
+            ELSE '5+'
+        END
+
+    ORDER BY 2 DESC
+    LIMIT 10";
 
             using var r = cmd.ExecuteReader();
 
@@ -480,8 +587,13 @@ namespace Tradetool.Core
             {
                 data.MethodsOdds.Add(new RankingItem
                 {
-                    Nome = r.GetString(0),
-                    Valor = r.GetDecimal(1)
+                    Nome = r.IsDBNull(0)
+                        ? ""
+                        : r.GetString(0),
+
+                    Valor = r.IsDBNull(1)
+                        ? 0
+                        : r.GetDecimal(1)
                 });
             }
         }
@@ -687,7 +799,7 @@ namespace Tradetool.Core
             if (!string.IsNullOrEmpty(team))
             {
                 filtro +=
-                    $" AND (Home LIKE '%{team}%' OR Away LIKE '%{team}%')";
+                    $" AND TargetTeam LIKE '%{team}%'";
             }
 
             if (!string.IsNullOrEmpty(month))
@@ -717,6 +829,8 @@ namespace Tradetool.Core
             MAX(Id) AS Id,
 
             MAX(Date) AS Date,
+
+            TargetTeam,
 
             Home,
             Away,
@@ -817,6 +931,7 @@ namespace Tradetool.Core
 
         GROUP BY
             strftime('%Y-%m-%d %H:%M', Date),
+            TargetTeam,
             Home,
             Away,
             Market,
@@ -861,6 +976,8 @@ namespace Tradetool.Core
                     Id = Convert.ToInt32(reader["Id"]),
 
                     Date = Convert.ToDateTime(reader["Date"]),
+
+                    TargetTeam = reader["TargetTeam"]?.ToString(),
 
                     Home = reader["Home"]?.ToString(),
 
@@ -913,7 +1030,8 @@ namespace Tradetool.Core
                 Amount = Convert.ToDecimal(reader["Amount"]),
                 BalanceAfter = Convert.ToDecimal(reader["BalanceAfter"]),
                 Comments = reader["Comments"]?.ToString(),
-                BetId = reader["BetId"] != DBNull.Value ? Convert.ToInt32(reader["BetId"]) : 0
+                BetId = reader["BetId"] != DBNull.Value ? Convert.ToInt32(reader["BetId"]) : 0,
+                TargetTeam = reader["TargetTeam"]?.ToString()
             };
         }
 

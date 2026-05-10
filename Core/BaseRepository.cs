@@ -28,8 +28,9 @@ namespace Tradetool.Core
             Odds REAL,                 -- Odds da aposta
             Amount REAL,               -- Valor da aposta (positivo para ganhos, negativo para perdas)
             BalanceAfter REAL,         -- Saldo após a aposta
-            Comments TEXT,              -- Comentários adicionais (extraído da descrição, como Red Card, In-Play, etc.)
-            BetId INTEGER              -- Número da aposta (extraído do BetId, para referência futura e evitar duplicidade
+            Comments TEXT,             -- Comentários adicionais (extraído da descrição, como Red Card, In-Play, etc.)
+            BetId INTEGER,             -- Número da aposta (extraído do BetId, para referência futura e evitar duplicidade
+            TargetTeam TEXT            -- Determina se a entrada foi contra ou a favor do time
         );";
 
         public BaseRepository()

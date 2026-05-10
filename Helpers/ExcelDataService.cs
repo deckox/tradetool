@@ -80,7 +80,7 @@ namespace Tradetool.Helpers
             var auxCount = aux.Count;
 
             // ignora depósitos
-            if (aux.FirstOrDefault()?.Contains("DEPOSIT", StringComparison.OrdinalIgnoreCase) == true 
+            if (aux.FirstOrDefault()?.Contains("DEPOSIT", StringComparison.OrdinalIgnoreCase) == true
                 || auxCount > 4 && aux.LastOrDefault() == "BACK")
                 return null;
 
@@ -88,28 +88,61 @@ namespace Tradetool.Helpers
 
             var betId = item.BetId > 0
                 ? item.BetId
-                : GenerateFallbackId(item); // 🔥 aqui está o segredo
+                : GenerateFallbackId(item);
+
+            var selection = aux[3].Contains("COMMISSION")
+                ? ""
+                : aux[3].Trim();
 
             var betRecordData = new BetRecordData
             {
                 BetId = betId,
                 Date = item.Date,
-                Stake = item.Stake.HasValue ? Math.Round(item.Stake.Value, 2, MidpointRounding.AwayFromZero) : null,
-                Responsability = aux[3].Contains("COMMISSION") ? 0 :
-                    (item.Odds.HasValue && item.Stake.HasValue
-                        ? Math.Round((item.Odds.Value - 1) * item.Stake.Value, 0, MidpointRounding.AwayFromZero)
+
+                Stake = item.Stake.HasValue
+                    ? Math.Round(item.Stake.Value, 2, MidpointRounding.AwayFromZero)
+                    : null,
+
+                Responsability = aux[3].Contains("COMMISSION")
+                    ? 0
+                    : (item.Odds.HasValue && item.Stake.HasValue
+                        ? Math.Round(
+                            (item.Odds.Value - 1) * item.Stake.Value,
+                            0,
+                            MidpointRounding.AwayFromZero)
                         : 0),
+
                 PL = CalculateProfitLoss(item, aux),
+
                 PLStake = CalculatePLStake(item),
+
                 Odds = item.Odds,
-                Amount = Math.Round(item.Amount, 2, MidpointRounding.AwayFromZero),
-                BalanceAfter = Math.Round(item.BalanceAfter, 2, MidpointRounding.AwayFromZero),
+
+                Amount = Math.Round(
+                    item.Amount,
+                    2,
+                    MidpointRounding.AwayFromZero),
+
+                BalanceAfter = Math.Round(
+                    item.BalanceAfter,
+                    2,
+                    MidpointRounding.AwayFromZero),
+
                 Home = team.FirstOrDefault()?.Trim(),
+
                 Away = team.LastOrDefault()?.Trim(),
+
                 Competition = aux.FirstOrDefault()?.Trim() ?? string.Empty,
+
                 Market = aux[2]?.Trim() ?? string.Empty,
-                Methods = aux[3].Contains("COMMISSION") ? string.Empty : aux[3].Trim(),
-                Side = aux.Count > 4 ? aux.LastOrDefault()?.Trim() : string.Empty
+
+                Methods = selection,
+
+                Selection = selection,
+
+                Side = aux.Count > 4
+                    ? aux.LastOrDefault()?.Trim()
+                    : string.Empty
             };
 
             return betRecordData;

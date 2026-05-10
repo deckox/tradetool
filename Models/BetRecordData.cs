@@ -20,5 +20,7 @@
         public string Comments { get; set; }
         public long BetId { get; set; }
         public decimal PercentualResultado { get; set; }
+        public string? TargetTeam { get; set; }
+        public string? Selection { get; set; }
     }
 }
