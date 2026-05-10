@@ -140,3 +140,4 @@ C:\Workspace\Tradetool\obj\Debug\net10.0\refint\Tradetool.dll
 C:\Workspace\Tradetool\obj\Debug\net10.0\Tradetool.pdb
 C:\Workspace\Tradetool\obj\Debug\net10.0\Tradetool.genruntimeconfig.cache
 C:\Workspace\Tradetool\obj\Debug\net10.0\ref\Tradetool.dll
+C:\Workspace\tradetool\obj\Debug\net10.0\Tradetool.sourcelink.json

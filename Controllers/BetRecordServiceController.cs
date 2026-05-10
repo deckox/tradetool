@@ -77,9 +77,12 @@ namespace Tradetool.Controllers
         // =========================
         // ANÁLISE POR TIME
         // =========================
-        public IActionResult TeamAnalysis(string? team)
+        public IActionResult TeamAnalysis(string? team, string? month)
         {
-            var data = _betRecord.GetDashboard(team, null);
+            var data = _betRecord.GetDashboard(team, month);
+
+            ViewBag.SelectedMonth = month;
+
             return View(data);
         }
 

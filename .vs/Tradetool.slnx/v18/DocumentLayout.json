@@ -1,12 +1,54 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "C:\\Workspace\\tradetool\\",
-  "Documents": [],
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{C59C6F8C-49AC-EB28-F95B-BB804232F8DE}|Tradetool.csproj|c:\\workspace\\tradetool\\views\\bet\\teamanalysis.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{C59C6F8C-49AC-EB28-F95B-BB804232F8DE}|Tradetool.csproj|solutionrelative:views\\bet\\teamanalysis.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C59C6F8C-49AC-EB28-F95B-BB804232F8DE}|Tradetool.csproj|c:\\workspace\\tradetool\\controllers\\betrecordservicecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C59C6F8C-49AC-EB28-F95B-BB804232F8DE}|Tradetool.csproj|solutionrelative:controllers\\betrecordservicecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
       "VerticalTabListWidth": 256,
-      "DocumentGroups": []
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "TeamAnalysis.cshtml",
+              "DocumentMoniker": "C:\\Workspace\\tradetool\\Views\\Bet\\TeamAnalysis.cshtml",
+              "RelativeDocumentMoniker": "Views\\Bet\\TeamAnalysis.cshtml",
+              "ToolTip": "C:\\Workspace\\tradetool\\Views\\Bet\\TeamAnalysis.cshtml",
+              "RelativeToolTip": "Views\\Bet\\TeamAnalysis.cshtml",
+              "ViewState": "AgIAAL0AAAAAAAAAAAAAAMkAAAAKAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-05-10T02:12:06.989Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "BetRecordServiceController.cs",
+              "DocumentMoniker": "C:\\Workspace\\tradetool\\Controllers\\BetRecordServiceController.cs",
+              "RelativeDocumentMoniker": "Controllers\\BetRecordServiceController.cs",
+              "ToolTip": "C:\\Workspace\\tradetool\\Controllers\\BetRecordServiceController.cs",
+              "RelativeToolTip": "Controllers\\BetRecordServiceController.cs",
+              "ViewState": "AgIAAEQAAAAAAAAAAAAwwFIAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-10T02:11:12.129Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
     }
   ]
 }

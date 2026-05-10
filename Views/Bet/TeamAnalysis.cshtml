@@ -190,6 +190,17 @@
         value="@Context.Request.Query["team"]"
     />
 
+    <div class="filter-group">
+
+        <label>Mês</label>
+
+        <input type="month"
+               name="month"
+               value="@ViewBag.SelectedMonth"
+               class="form-control" />
+
+    </div>
+
     <button type="submit">
         Buscar
     </button>
