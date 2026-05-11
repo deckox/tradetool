@@ -318,21 +318,38 @@ namespace Tradetool.Core
         #region KPI
 
         private void LoadKpis(
-    SqliteConnection connection,
-    DashboardData data,
-    string filtro)
+     SqliteConnection connection,
+     DashboardData data,
+     string filtro)
         {
             using var cmd = connection.CreateCommand();
 
             cmd.CommandText = $@"
+
+    WITH Trades AS
+    (
+        SELECT
+            BetId,
+            ROUND(SUM(Amount),2) AS Resultado
+
+        FROM BetHistory
+
+        {filtro}
+
+        AND Methods <> 'COMMISSION'
+
+        GROUP BY BetId
+    )
+
     SELECT
-        ROUND(SUM(Amount),2),
+
+        ROUND(SUM(Resultado),2),
 
         ROUND(
             (
-                SUM(Amount)
+                SUM(Resultado)
                 /
-                NULLIF(SUM(ABS(Amount)),0)
+                NULLIF(SUM(ABS(Resultado)),0)
             ) * 100
         ,2),
 
@@ -340,7 +357,7 @@ namespace Tradetool.Core
             (
                 SUM(
                     CASE
-                        WHEN Amount > 0
+                        WHEN Resultado > 0
                         THEN 1
                         ELSE 0
                     END
@@ -350,11 +367,9 @@ namespace Tradetool.Core
 
         COUNT(*),
 
-        ROUND(AVG(Amount),2)
+        ROUND(AVG(Resultado),2)
 
-    FROM BetHistory
-    {filtro}
-    AND ABS(Amount) > 0.01";
+    FROM Trades";
 
             using var r = cmd.ExecuteReader();
 
@@ -476,14 +491,42 @@ namespace Tradetool.Core
         #region METHODS ODDS
 
         private void LoadMethodsOdds(
-     SqliteConnection connection,
-     DashboardData data,
-     string filtro)
+    SqliteConnection connection,
+    DashboardData data,
+    string filtro)
         {
             using var cmd = connection.CreateCommand();
 
             cmd.CommandText = $@"
+
+    WITH Trades AS
+    (
+        SELECT
+
+            BetId,
+
+            Methods,
+
+            Odds,
+
+            ROUND(SUM(Amount),2) AS Resultado
+
+        FROM BetHistory
+
+        {filtro}
+
+        AND Methods IS NOT NULL
+        AND TRIM(Methods) <> ''
+        AND Methods <> 'COMMISSION'
+
+        GROUP BY
+            BetId,
+            Methods,
+            Odds
+    )
+
     SELECT
+
         Methods || ' | ' ||
 
         CASE
@@ -493,14 +536,9 @@ namespace Tradetool.Core
             ELSE '5+'
         END,
 
-        ROUND(SUM(Amount),2)
+        ROUND(SUM(Resultado),2)
 
-    FROM BetHistory
-
-    {filtro}
-
-    AND Methods IS NOT NULL
-    AND TRIM(Methods) <> ''
+    FROM Trades
 
     GROUP BY
         Methods,
@@ -512,7 +550,8 @@ namespace Tradetool.Core
             ELSE '5+'
         END
 
-    ORDER BY 2 DESC
+    ORDER BY SUM(Resultado) DESC
+
     LIMIT 10";
 
             using var r = cmd.ExecuteReader();
