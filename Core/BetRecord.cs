@@ -310,6 +310,8 @@ namespace Tradetool.Core
 
             data.AlertaPerda = data.LucroTotal < 0;
 
+            data.TeamEntries = GetTeamEntries(team, month);
+
             return data;
         }
 
@@ -785,49 +787,38 @@ namespace Tradetool.Core
         }
 
         public List<BetRecordData> GetHistory(
-    string? period = null,
-    string? startDate = null,
-    string? endDate = null,
-    string? month = null)
-        {
-            using var connection = GetConnection();
-            connection.Open();
+        string? period = null,
+        string? startDate = null,
+        string? endDate = null,
+        string? month = null)
+            {
+                using var connection = GetConnection();
+                connection.Open();
 
-            var sql = @"
+                var sql = @"
 
-    WITH Trades AS (
+        WITH Trades AS (
 
-        SELECT
+            SELECT
 
-            MAX(Id) AS Id,
+                MAX(Id) AS Id,
 
-            MAX(Date) AS Date,
+                MAX(Date) AS Date,
 
-            TargetTeam,
+                TargetTeam,
 
-            Home,
-            Away,
+                Home,
+                Away,
 
-            MAX(Competition) AS Competition,
+                MAX(Competition) AS Competition,
 
-            MAX(Market) AS Market,
+                MAX(Market) AS Market,
 
-            MAX(Methods) AS Methods,
+                MAX(Methods) AS Methods,
 
-            MAX(Odds) AS Odds,
+                MAX(Odds) AS Odds,
 
-            ROUND(
-                MAX(
-                    CASE
-                        WHEN Side = 'LAY'
-                        THEN Responsability
-                        ELSE 0
-                    END
-                )
-            ,2) AS Responsabilidade,
-
-            ROUND(
-                (
+                ROUND(
                     MAX(
                         CASE
                             WHEN Side = 'LAY'
@@ -835,152 +826,236 @@ namespace Tradetool.Core
                             ELSE 0
                         END
                     )
-                )
-                /
-                NULLIF(
-                    MAX(Odds) - 1,
-                    0
-                )
-            ,2) AS StakeEntrada,
+                ,2) AS Responsabilidade,
 
-            ROUND(
-                SUM(
-                    CASE
-                        WHEN Side = 'LAY'
-                        THEN Stake
-                        ELSE 0
-                    END
-                )
-                -
-                SUM(
-                    CASE
-                        WHEN Side = 'BACK'
-                        THEN Stake
-                        ELSE 0
-                    END
-                )
-            ,2) AS Lucro
+                ROUND(
+                    (
+                        MAX(
+                            CASE
+                                WHEN Side = 'LAY'
+                                THEN Responsability
+                                ELSE 0
+                            END
+                        )
+                    )
+                    /
+                    NULLIF(
+                        MAX(Odds) - 1,
+                        0
+                    )
+                ,2) AS StakeEntrada,
 
-        FROM BetHistory
+                ROUND(
+                    SUM(
+                        CASE
+                            WHEN Side = 'LAY'
+                            THEN Stake
+                            ELSE 0
+                        END
+                    )
+                    -
+                    SUM(
+                        CASE
+                            WHEN Side = 'BACK'
+                            THEN Stake
+                            ELSE 0
+                        END
+                    )
+                ,2) AS Lucro
 
-        WHERE 1=1
-    ";
+            FROM BetHistory
+
+            WHERE 1=1
+        ";
+
+                using var cmd = connection.CreateCommand();
+
+                if (period == "week")
+                {
+                    sql += " AND Date >= date('now', '-7 day')";
+                }
+
+                if (!string.IsNullOrEmpty(month))
+                {
+                    sql += " AND strftime('%Y-%m', Date) = @month";
+
+                    cmd.Parameters.AddWithValue(
+                        "@month",
+                        month);
+                }
+
+                if (!string.IsNullOrEmpty(startDate))
+                {
+                    sql += " AND Date >= @startDate";
+
+                    cmd.Parameters.AddWithValue(
+                        "@startDate",
+                        startDate);
+                }
+
+                if (!string.IsNullOrEmpty(endDate))
+                {
+                    sql += " AND Date <= @endDate";
+
+                    cmd.Parameters.AddWithValue(
+                        "@endDate",
+                        endDate + " 23:59:59");
+                }
+
+                sql += @"
+
+            GROUP BY
+                strftime('%Y-%m-%d %H:%M', Date),
+                TargetTeam,
+                Home,
+                Away,
+                Market,
+                Methods
+        )
+
+        SELECT *
+        FROM Trades
+        WHERE Lucro <> 0
+        ORDER BY Date DESC;
+        ";
+
+                cmd.CommandText = sql;
+
+                var list = new List<BetRecordData>();
+
+                using var reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    var responsabilidade =
+                        reader["Responsabilidade"] != DBNull.Value
+                            ? Convert.ToDecimal(reader["Responsabilidade"])
+                            : 0;
+
+                    var lucro =
+                        reader["Lucro"] != DBNull.Value
+                            ? Convert.ToDecimal(reader["Lucro"])
+                            : 0;
+
+                    decimal roi = 0;
+
+                    if (responsabilidade > 0)
+                    {
+                        roi = Math.Round(
+                            (lucro / responsabilidade) * 100,
+                            2);
+                    }
+
+                    list.Add(new BetRecordData
+                    {
+                        Id = Convert.ToInt32(reader["Id"]),
+
+                        Date = Convert.ToDateTime(reader["Date"]),
+
+                        TargetTeam = reader["TargetTeam"]?.ToString(),
+
+                        Home = reader["Home"]?.ToString(),
+
+                        Away = reader["Away"]?.ToString(),
+
+                        Competition = reader["Competition"]?.ToString(),
+
+                        Market = reader["Market"]?.ToString(),
+
+                        Methods = reader["Methods"]?.ToString(),
+
+                        Side = "LAY",
+
+                        Odds = reader["Odds"] != DBNull.Value
+                            ? Convert.ToDecimal(reader["Odds"])
+                            : null,
+
+                        Stake = reader["StakeEntrada"] != DBNull.Value
+                            ? Convert.ToDecimal(reader["StakeEntrada"])
+                            : null,
+
+                        Responsability = responsabilidade,
+
+                        PL = lucro,
+
+                        PLStake = roi
+                    });
+                }
+
+                return list;
+            }
+
+        private List<BetRecordData> GetTeamEntries(
+    string? team,
+    string? month)
+        {
+            using var connection = GetConnection();
+
+            connection.Open();
+
+            var result = new List<BetRecordData>();
 
             using var cmd = connection.CreateCommand();
 
-            if (period == "week")
+            var filtro = BuildFilter(team, month);
+
+            cmd.CommandText = $@"
+    SELECT
+        Date,
+        Stake,
+        Amount,
+        Home,
+        Away,
+        Market,
+        Methods,
+        Competition,
+        Odds
+
+    FROM BetHistory
+
+    {filtro}
+
+    ORDER BY Date DESC";
+
+            using var r = cmd.ExecuteReader();
+
+            while (r.Read())
             {
-                sql += " AND Date >= date('now', '-7 day')";
-            }
-
-            if (!string.IsNullOrEmpty(month))
-            {
-                sql += " AND strftime('%Y-%m', Date) = @month";
-
-                cmd.Parameters.AddWithValue(
-                    "@month",
-                    month);
-            }
-
-            if (!string.IsNullOrEmpty(startDate))
-            {
-                sql += " AND Date >= @startDate";
-
-                cmd.Parameters.AddWithValue(
-                    "@startDate",
-                    startDate);
-            }
-
-            if (!string.IsNullOrEmpty(endDate))
-            {
-                sql += " AND Date <= @endDate";
-
-                cmd.Parameters.AddWithValue(
-                    "@endDate",
-                    endDate + " 23:59:59");
-            }
-
-            sql += @"
-
-        GROUP BY
-            strftime('%Y-%m-%d %H:%M', Date),
-            TargetTeam,
-            Home,
-            Away,
-            Market,
-            Methods
-    )
-
-    SELECT *
-    FROM Trades
-    WHERE Lucro <> 0
-    ORDER BY Date DESC;
-    ";
-
-            cmd.CommandText = sql;
-
-            var list = new List<BetRecordData>();
-
-            using var reader = cmd.ExecuteReader();
-
-            while (reader.Read())
-            {
-                var responsabilidade =
-                    reader["Responsabilidade"] != DBNull.Value
-                        ? Convert.ToDecimal(reader["Responsabilidade"])
-                        : 0;
-
-                var lucro =
-                    reader["Lucro"] != DBNull.Value
-                        ? Convert.ToDecimal(reader["Lucro"])
-                        : 0;
-
-                decimal roi = 0;
-
-                if (responsabilidade > 0)
+                result.Add(new BetRecordData
                 {
-                    roi = Math.Round(
-                        (lucro / responsabilidade) * 100,
-                        2);
-                }
+                    Date = DateTime.Parse(r["Date"].ToString()!),
 
-                list.Add(new BetRecordData
-                {
-                    Id = Convert.ToInt32(reader["Id"]),
+                    Stake =
+                        r["Stake"] == DBNull.Value
+                        ? null
+                        : Convert.ToDecimal(r["Stake"]),
 
-                    Date = Convert.ToDateTime(reader["Date"]),
+                    Amount =
+                        Convert.ToDecimal(r["Amount"]),
 
-                    TargetTeam = reader["TargetTeam"]?.ToString(),
+                    Home =
+                        r["Home"]?.ToString(),
 
-                    Home = reader["Home"]?.ToString(),
+                    Away =
+                        r["Away"]?.ToString(),
 
-                    Away = reader["Away"]?.ToString(),
+                    Market =
+                        r["Market"]?.ToString(),
 
-                    Competition = reader["Competition"]?.ToString(),
+                    Methods =
+                        r["Methods"]?.ToString(),
 
-                    Market = reader["Market"]?.ToString(),
+                    Competition =
+                        r["Competition"]?.ToString(),
 
-                    Methods = reader["Methods"]?.ToString(),
-
-                    Side = "LAY",
-
-                    Odds = reader["Odds"] != DBNull.Value
-                        ? Convert.ToDecimal(reader["Odds"])
-                        : null,
-
-                    Stake = reader["StakeEntrada"] != DBNull.Value
-                        ? Convert.ToDecimal(reader["StakeEntrada"])
-                        : null,
-
-                    Responsability = responsabilidade,
-
-                    PL = lucro,
-
-                    PLStake = roi
+                    Odds =
+                        r["Odds"] == DBNull.Value
+                        ? null
+                        : Convert.ToDecimal(r["Odds"])
                 });
             }
 
-            return list;
+            return result;
         }
 
         private BetRecordData Parse(SqliteDataReader reader)

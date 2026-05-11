@@ -389,6 +389,84 @@
     });
 </script>
 
+<div class="card" style="margin-top:25px; overflow:auto;">
+
+    <h3>📜 Entradas</h3>
+
+    <table class="bet-table">
+
+        <thead>
+            <tr>
+                <th>Data</th>
+                <th>Stake</th>
+                <th>Lucro</th>
+                <th>% Lucro</th>
+                <th>Mandante</th>
+                <th>Visitante</th>
+                <th>Método</th>
+                <th>Competição</th>
+                <th>Odd</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            @foreach (var item in Model.TeamEntries)
+            {
+                decimal roi = 0;
+
+                if (item.Stake.HasValue && item.Stake > 0)
+                {
+                    roi = (item.Amount / item.Stake.Value) * 100;
+                }
+
+                <tr>
+
+                    <td>
+                        @item.Date.ToString("dd/MM/yyyy")
+                    </td>
+
+                    <td>
+                        $ @item.Stake?.ToString("N2")
+                    </td>
+
+                    <td class="@(item.Amount >= 0 ? "profit" : "loss")">
+                        $ @item.Amount.ToString("N2")
+                    </td>
+
+                    <td class="@(roi >= 0 ? "profit" : "loss")">
+                        @roi.ToString("N2")%
+                    </td>
+
+                    <td>
+                        @item.Home
+                    </td>
+
+                    <td>
+                        @item.Away
+                    </td>
+
+                    <td>
+                        @item.Market @item.Methods
+                    </td>
+
+                    <td>
+                        @item.Competition
+                    </td>
+
+                    <td>
+                        @item.Odds
+                    </td>
+
+                </tr>
+            }
+
+        </tbody>
+
+    </table>
+
+</div>
+
 <!-- AUTOCOMPLETE -->
 <script>
     let teams = [];

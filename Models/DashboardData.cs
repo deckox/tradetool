@@ -39,6 +39,8 @@ namespace Tradetool.Models
         public List<OddsAnalysis> OddsAnalysis { get; set; } = new();
         public List<OddsAnalysis> OddsROI { get; set; } = new();
 
+        public List<BetRecordData> TeamEntries { get; set; } = new();
+
         // ===== ALERTA =====
         public bool AlertaPerda { get; set; }
 
