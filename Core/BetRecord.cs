@@ -318,59 +318,63 @@ namespace Tradetool.Core
         #region KPI
 
         private void LoadKpis(
-            SqliteConnection connection,
-            DashboardData data,
-            string filtro)
+    SqliteConnection connection,
+    DashboardData data,
+    string filtro)
         {
             using var cmd = connection.CreateCommand();
 
             cmd.CommandText = $@"
-            WITH Trades AS (
-                SELECT 
-                    strftime('%Y-%m-%d %H:%M', Date) AS Data,
+    SELECT
+        ROUND(SUM(Amount),2),
 
-                    ROUND(
-                        SUM(CASE WHEN Side='LAY' THEN Stake ELSE 0 END) -
-                        SUM(CASE WHEN Side='BACK' THEN Stake ELSE 0 END)
-                    ,2) AS Resultado
+        ROUND(
+            (
+                SUM(Amount)
+                /
+                NULLIF(SUM(ABS(Amount)),0)
+            ) * 100
+        ,2),
 
-                FROM BetHistory
-                {filtro}
+        ROUND(
+            (
+                SUM(
+                    CASE
+                        WHEN Amount > 0
+                        THEN 1
+                        ELSE 0
+                    END
+                ) * 100.0
+            ) / COUNT(*)
+        ,2),
 
-                GROUP BY Data, Home, Away, Market, Methods
-            )
+        COUNT(*),
 
-            SELECT
-                ROUND(SUM(Resultado),2),
+        ROUND(AVG(Amount),2)
 
-                ROUND(
-                    (SUM(Resultado) / NULLIF(SUM(ABS(Resultado)),0)) * 100
-                ,2),
-
-                ROUND(
-                    (
-                        SUM(CASE WHEN Resultado > 0 THEN 1 ELSE 0 END)
-                        * 100.0
-                    ) / COUNT(*)
-                ,2),
-
-                COUNT(*),
-
-                ROUND(AVG(Resultado),2)
-
-            FROM Trades
-            WHERE ABS(Resultado) > 0.01";
+    FROM BetHistory
+    {filtro}
+    AND ABS(Amount) > 0.01";
 
             using var r = cmd.ExecuteReader();
 
             if (!r.Read())
                 return;
 
-            data.LucroTotal = r.IsDBNull(0) ? 0 : r.GetDecimal(0);
-            data.ROI = r.IsDBNull(1) ? 0 : r.GetDecimal(1);
-            data.Winrate = r.IsDBNull(2) ? 0 : r.GetDecimal(2);
-            data.TotalTrades = r.IsDBNull(3) ? 0 : r.GetInt32(3);
-            data.LucroMedio = r.IsDBNull(4) ? 0 : r.GetDecimal(4);
+            data.LucroTotal =
+                r.IsDBNull(0) ? 0 : r.GetDecimal(0);
+
+            data.ROI =
+                r.IsDBNull(1) ? 0 : r.GetDecimal(1);
+
+            data.Winrate =
+                r.IsDBNull(2) ? 0 : r.GetDecimal(2);
+
+            data.TotalTrades =
+                r.IsDBNull(3) ? 0 : r.GetInt32(3);
+
+            data.LucroMedio =
+                r.IsDBNull(4) ? 0 : r.GetDecimal(4);
         }
 
         #endregion
@@ -439,10 +443,7 @@ namespace Tradetool.Core
                 {campo},
 
                 ROUND(
-                    SUM(
-                        CASE WHEN Side='LAY' THEN Stake ELSE 0 END -
-                        CASE WHEN Side='BACK' THEN Stake ELSE 0 END
-                    )
+                    SUM(Amount)
                 ,2)
 
             FROM BetHistory
@@ -475,83 +476,14 @@ namespace Tradetool.Core
         #region METHODS ODDS
 
         private void LoadMethodsOdds(
-    SqliteConnection connection,
-    DashboardData data,
-    string filtro)
+     SqliteConnection connection,
+     DashboardData data,
+     string filtro)
         {
             using var cmd = connection.CreateCommand();
 
             cmd.CommandText = $@"
-
-    WITH Trades AS (
-
-        SELECT
-
-            Home,
-            Away,
-            Methods,
-            Market,
-            Odds,
-
-            ROUND(
-                SUM(
-                    CASE
-                        WHEN Side='LAY'
-                        THEN Stake
-                        ELSE 0
-                    END
-                )
-                -
-                SUM(
-                    CASE
-                        WHEN Side='BACK'
-                        THEN Stake
-                        ELSE 0
-                    END
-                )
-            ,2) AS Resultado,
-
-            CASE
-
-                -- CASA FAVORECIDA
-
-                WHEN (
-                    CAST(substr(Market,1,instr(Market,'-')-1) AS INTEGER)
-                    >
-                    CAST(substr(Market,instr(Market,'-')+1) AS INTEGER)
-                )
-                THEN Home
-
-                -- VISITANTE FAVORECIDO
-
-                WHEN (
-                    CAST(substr(Market,1,instr(Market,'-')-1) AS INTEGER)
-                    <
-                    CAST(substr(Market,instr(Market,'-')+1) AS INTEGER)
-                )
-                THEN Away
-
-                ELSE NULL
-
-            END AS TeamFavorecido
-
-        FROM BetHistory
-
-        {filtro}
-
-        AND Methods IS NOT NULL
-        AND TRIM(Methods) <> ''
-
-        GROUP BY
-            strftime('%Y-%m-%d %H:%M', Date),
-            Home,
-            Away,
-            Market,
-            Methods
-    )
-
     SELECT
-
         Methods || ' | ' ||
 
         CASE
@@ -561,12 +493,14 @@ namespace Tradetool.Core
             ELSE '5+'
         END,
 
-        ROUND(SUM(Resultado),2)
+        ROUND(SUM(Amount),2)
 
-    FROM Trades
+    FROM BetHistory
 
-    WHERE
-        TeamFavorecido IS NOT NULL
+    {filtro}
+
+    AND Methods IS NOT NULL
+    AND TRIM(Methods) <> ''
 
     GROUP BY
         Methods,
@@ -799,7 +733,7 @@ namespace Tradetool.Core
             if (!string.IsNullOrEmpty(team))
             {
                 filtro +=
-                    $" AND TargetTeam LIKE '%{team}%'";
+                    $" AND TargetTeam = '{team}'";
             }
 
             if (!string.IsNullOrEmpty(month))

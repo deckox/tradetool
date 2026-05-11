@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Tradetool")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+cf2125b91492f94f6806b6a5ffecc880264d9d9e")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d2a91d2e76b6325d9fadfa176f556a057ffa7582")]
 [assembly: System.Reflection.AssemblyProductAttribute("Tradetool")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Tradetool")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

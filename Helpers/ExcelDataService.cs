@@ -80,8 +80,7 @@ namespace Tradetool.Helpers
             var auxCount = aux.Count;
 
             // ignora depósitos
-            if (aux.FirstOrDefault()?.Contains("DEPOSIT", StringComparison.OrdinalIgnoreCase) == true
-                || auxCount > 4 && aux.LastOrDefault() == "BACK")
+            if (aux.FirstOrDefault()?.Contains("DEPOSIT", StringComparison.OrdinalIgnoreCase) == true)
                 return null;
 
             var team = aux[1].Split("vs").ToList();

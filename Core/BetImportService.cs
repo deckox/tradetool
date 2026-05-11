@@ -66,44 +66,96 @@ namespace Tradetool.Core
 
         private string DetectTargetTeam(BetRecordData item)
         {
-            if (string.IsNullOrEmpty(item.Methods))
+            if (string.IsNullOrWhiteSpace(item.Methods))
                 return "";
 
-            // Exemplo: 1-0
-            var score = item.Methods.Split('-');
-
-            if (score.Length != 2)
-                return "";
-
-            if (!int.TryParse(score[0], out int homeGoals))
-                return "";
-
-            if (!int.TryParse(score[1], out int awayGoals))
-                return "";
+            var method = item.Methods.Trim().ToUpper();
 
             // =====================================
-            // BACK
+            // CORRECT SCORE NUMÉRICO
             // =====================================
 
-            if (item.Side == "BACK")
+            if (method.Contains("-"))
             {
-                if (homeGoals > awayGoals)
+                var score = method.Split('-');
+
+                if (score.Length == 2
+                    && int.TryParse(score[0], out int homeGoals)
+                    && int.TryParse(score[1], out int awayGoals))
+                {
+                    // =============================
+                    // BACK
+                    // =============================
+
+                    if (item.Side == "BACK")
+                    {
+                        if (homeGoals > awayGoals)
+                            return item.Home ?? "";
+
+                        if (awayGoals > homeGoals)
+                            return item.Away ?? "";
+                    }
+
+                    // =============================
+                    // LAY
+                    // =============================
+
+                    if (item.Side == "LAY")
+                    {
+                        if (homeGoals > awayGoals)
+                            return item.Away ?? "";
+
+                        if (awayGoals > homeGoals)
+                            return item.Home ?? "";
+                    }
+                }
+            }
+
+            // =====================================
+            // ANY OTHER HOME WIN
+            // =====================================
+
+            if (method == "ANY OTHER HOME WIN")
+            {
+                if (item.Side == "BACK")
                     return item.Home ?? "";
 
-                if (awayGoals > homeGoals)
+                if (item.Side == "LAY")
                     return item.Away ?? "";
             }
 
             // =====================================
-            // LAY
+            // ANY OTHER AWAY WIN
             // =====================================
 
-            if (item.Side == "LAY")
+            if (method == "ANY OTHER AWAY WIN")
             {
-                if (homeGoals > awayGoals)
+                if (item.Side == "BACK")
                     return item.Away ?? "";
 
-                if (awayGoals > homeGoals)
+                if (item.Side == "LAY")
+                    return item.Home ?? "";
+            }
+
+            // =====================================
+            // MATCH ODDS / TIME DIRETO
+            // =====================================
+
+            if (method == (item.Home ?? "").ToUpper())
+            {
+                if (item.Side == "BACK")
+                    return item.Home ?? "";
+
+                if (item.Side == "LAY")
+                    return item.Away ?? "";
+            }
+
+            if (method == (item.Away ?? "").ToUpper())
+            {
+                if (item.Side == "BACK")
+                    return item.Away ?? "";
+
+                if (item.Side == "LAY")
                     return item.Home ?? "";
             }
 
