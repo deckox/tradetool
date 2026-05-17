@@ -66,98 +66,62 @@ namespace Tradetool.Core
 
         private string DetectTargetTeam(BetRecordData item)
         {
-            if (string.IsNullOrWhiteSpace(item.Methods))
+            if (string.IsNullOrWhiteSpace(item.Selection))
                 return "";
 
-            var method = item.Methods.Trim().ToUpper();
+            var selection =
+                item.Selection
+                    .Trim()
+                    .ToUpper();
 
-            // =====================================
-            // CORRECT SCORE NUMÉRICO
-            // =====================================
-
-            if (method.Contains("-"))
-            {
-                var score = method.Split('-');
-
-                if (score.Length == 2
-                    && int.TryParse(score[0], out int homeGoals)
-                    && int.TryParse(score[1], out int awayGoals))
-                {
-                    // =============================
-                    // BACK
-                    // =============================
-
-                    if (item.Side == "BACK")
-                    {
-                        if (homeGoals > awayGoals)
-                            return item.Home ?? "";
-
-                        if (awayGoals > homeGoals)
-                            return item.Away ?? "";
-                    }
-
-                    // =============================
-                    // LAY
-                    // =============================
-
-                    if (item.Side == "LAY")
-                    {
-                        if (homeGoals > awayGoals)
-                            return item.Away ?? "";
-
-                        if (awayGoals > homeGoals)
-                            return item.Home ?? "";
-                    }
-                }
-            }
-
-            // =====================================
+            // =========================
             // ANY OTHER HOME WIN
-            // =====================================
+            // =========================
 
-            if (method == "ANY OTHER HOME WIN")
+            if (selection.Contains("ANY OTHER HOME WIN"))
             {
-                if (item.Side == "BACK")
-                    return item.Home ?? "";
-
-                if (item.Side == "LAY")
-                    return item.Away ?? "";
+                return item.Home ?? "";
             }
 
-            // =====================================
+            // =========================
             // ANY OTHER AWAY WIN
-            // =====================================
+            // =========================
 
-            if (method == "ANY OTHER AWAY WIN")
+            if (selection.Contains("ANY OTHER AWAY WIN"))
             {
-                if (item.Side == "BACK")
-                    return item.Away ?? "";
-
-                if (item.Side == "LAY")
-                    return item.Home ?? "";
+                return item.Away ?? "";
             }
 
-            // =====================================
-            // MATCH ODDS / TIME DIRETO
-            // =====================================
+            // =========================
+            // SCORE X-Y
+            // =========================
 
-            if (method == (item.Home ?? "").ToUpper())
+            var parts = selection.Split('-');
+
+            if (parts.Length != 2)
+                return "";
+
+            if (!int.TryParse(parts[0], out int homeGoals))
+                return "";
+
+            if (!int.TryParse(parts[1], out int awayGoals))
+                return "";
+
+            // vitória mandante
+
+            if (homeGoals > awayGoals)
             {
-                if (item.Side == "BACK")
-                    return item.Home ?? "";
-
-                if (item.Side == "LAY")
-                    return item.Away ?? "";
+                return item.Home ?? "";
             }
 
-            if (method == (item.Away ?? "").ToUpper())
-            {
-                if (item.Side == "BACK")
-                    return item.Away ?? "";
+            // vitória visitante
 
-                if (item.Side == "LAY")
-                    return item.Home ?? "";
+            if (awayGoals > homeGoals)
+            {
+                return item.Away ?? "";
             }
+
+            // empate
 
             return "";
         }
