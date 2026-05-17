@@ -127,7 +127,7 @@
                 <th>Método</th>
                 <th>Side</th>
                 <th>Odds</th>
-                <th>Stake</th>
+                <th>Stake Real</th>
                 <th>PL</th>
                 <th>Comentário</th>
             </tr>
@@ -158,7 +158,7 @@
                     <td>@item.Odds</td>
 
                     <td>
-                        R$ @item.Stake?.ToString("N2")
+                        @(item.RealStake?.ToString("C"))
                     </td>
 
                     <td class="@(item.PL >= 0 ? "positive" : "negative")">

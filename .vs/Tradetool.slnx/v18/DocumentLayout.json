@@ -3,16 +3,28 @@
   "WorkspaceRootPath": "C:\\Workspace\\tradetool\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{C59C6F8C-49AC-EB28-F95B-BB804232F8DE}|Tradetool.csproj|c:\\workspace\\tradetool\\core\\betrecord.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C59C6F8C-49AC-EB28-F95B-BB804232F8DE}|Tradetool.csproj|solutionrelative:core\\betrecord.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C59C6F8C-49AC-EB28-F95B-BB804232F8DE}|Tradetool.csproj|c:\\workspace\\tradetool\\views\\bet\\history.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{C59C6F8C-49AC-EB28-F95B-BB804232F8DE}|Tradetool.csproj|solutionrelative:views\\bet\\history.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C59C6F8C-49AC-EB28-F95B-BB804232F8DE}|Tradetool.csproj|c:\\workspace\\tradetool\\controllers\\betrecordservicecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C59C6F8C-49AC-EB28-F95B-BB804232F8DE}|Tradetool.csproj|solutionrelative:controllers\\betrecordservicecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C59C6F8C-49AC-EB28-F95B-BB804232F8DE}|Tradetool.csproj|c:\\workspace\\tradetool\\models\\betrecorddata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C59C6F8C-49AC-EB28-F95B-BB804232F8DE}|Tradetool.csproj|solutionrelative:models\\betrecorddata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{C59C6F8C-49AC-EB28-F95B-BB804232F8DE}|Tradetool.csproj|c:\\workspace\\tradetool\\core\\betimportservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{C59C6F8C-49AC-EB28-F95B-BB804232F8DE}|Tradetool.csproj|solutionrelative:core\\betimportservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{C59C6F8C-49AC-EB28-F95B-BB804232F8DE}|Tradetool.csproj|c:\\workspace\\tradetool\\views\\bet\\teamanalysis.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
       "RelativeMoniker": "D:0:0:{C59C6F8C-49AC-EB28-F95B-BB804232F8DE}|Tradetool.csproj|solutionrelative:views\\bet\\teamanalysis.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{C59C6F8C-49AC-EB28-F95B-BB804232F8DE}|Tradetool.csproj|c:\\workspace\\tradetool\\core\\betrecord.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{C59C6F8C-49AC-EB28-F95B-BB804232F8DE}|Tradetool.csproj|solutionrelative:core\\betrecord.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{C59C6F8C-49AC-EB28-F95B-BB804232F8DE}|Tradetool.csproj|c:\\workspace\\tradetool\\models\\dashboarddata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -27,16 +39,8 @@
       "RelativeMoniker": "D:0:0:{C59C6F8C-49AC-EB28-F95B-BB804232F8DE}|Tradetool.csproj|solutionrelative:helpers\\exceldataservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{C59C6F8C-49AC-EB28-F95B-BB804232F8DE}|Tradetool.csproj|c:\\workspace\\tradetool\\models\\betrecorddata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{C59C6F8C-49AC-EB28-F95B-BB804232F8DE}|Tradetool.csproj|solutionrelative:models\\betrecorddata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{C59C6F8C-49AC-EB28-F95B-BB804232F8DE}|Tradetool.csproj|c:\\workspace\\tradetool\\core\\baserepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{C59C6F8C-49AC-EB28-F95B-BB804232F8DE}|Tradetool.csproj|solutionrelative:core\\baserepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{C59C6F8C-49AC-EB28-F95B-BB804232F8DE}|Tradetool.csproj|c:\\workspace\\tradetool\\controllers\\betrecordservicecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{C59C6F8C-49AC-EB28-F95B-BB804232F8DE}|Tradetool.csproj|solutionrelative:controllers\\betrecordservicecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -46,23 +50,24 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 5,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "DashboardData.cs",
-              "DocumentMoniker": "C:\\Workspace\\tradetool\\Models\\DashboardData.cs",
-              "RelativeDocumentMoniker": "Models\\DashboardData.cs",
-              "ToolTip": "C:\\Workspace\\tradetool\\Models\\DashboardData.cs",
-              "RelativeToolTip": "Models\\DashboardData.cs",
-              "ViewState": "AgIAABwAAAAAAAAAAAAUwCkAAABFAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-11T23:44:42.009Z"
+              "DocumentIndex": 1,
+              "Title": "History.cshtml",
+              "DocumentMoniker": "C:\\Workspace\\tradetool\\Views\\Bet\\History.cshtml",
+              "RelativeDocumentMoniker": "Views\\Bet\\History.cshtml",
+              "ToolTip": "C:\\Workspace\\tradetool\\Views\\Bet\\History.cshtml",
+              "RelativeToolTip": "Views\\Bet\\History.cshtml",
+              "ViewState": "AgIAAIMAAAAAAAAAAAAuwJsAAAAnAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-05-17T16:56:37.069Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 7,
               "Title": "_Layout.cshtml",
               "DocumentMoniker": "C:\\Workspace\\tradetool\\Views\\Shared\\_Layout.cshtml",
               "RelativeDocumentMoniker": "Views\\Shared\\_Layout.cshtml",
@@ -74,7 +79,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 4,
               "Title": "BetImportService.cs",
               "DocumentMoniker": "C:\\Workspace\\tradetool\\Core\\BetImportService.cs",
               "RelativeDocumentMoniker": "Core\\BetImportService.cs",
@@ -87,7 +92,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 9,
               "Title": "BaseRepository.cs",
               "DocumentMoniker": "C:\\Workspace\\tradetool\\Core\\BaseRepository.cs",
               "RelativeDocumentMoniker": "Core\\BaseRepository.cs",
@@ -99,31 +104,58 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 3,
               "Title": "BetRecordData.cs",
               "DocumentMoniker": "C:\\Workspace\\tradetool\\Models\\BetRecordData.cs",
               "RelativeDocumentMoniker": "Models\\BetRecordData.cs",
               "ToolTip": "C:\\Workspace\\tradetool\\Models\\BetRecordData.cs",
               "RelativeToolTip": "Models\\BetRecordData.cs",
-              "ViewState": "AgIAAAgAAAAAAAAAAAAwwBIAAAAxAAAAAAAAAA==",
+              "ViewState": "AgIAAAgAAAAAAAAAAAA9wA8AAAAoAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-10T02:39:38.66Z"
+              "WhenOpened": "2026-05-10T02:39:38.66Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 0,
               "Title": "BetRecord.cs",
               "DocumentMoniker": "C:\\Workspace\\tradetool\\Core\\BetRecord.cs",
               "RelativeDocumentMoniker": "Core\\BetRecord.cs",
               "ToolTip": "C:\\Workspace\\tradetool\\Core\\BetRecord.cs",
               "RelativeToolTip": "Core\\BetRecord.cs",
-              "ViewState": "AgIAAAUEAAAAAAAAAAAuwCIEAAAJAAAAAAAAAA==",
+              "ViewState": "AgIAAIYDAAAAAAAAAAAIwKUDAAAJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-10T02:20:05.138Z"
+              "WhenOpened": "2026-05-10T02:20:05.138Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
+              "Title": "BetRecordServiceController.cs",
+              "DocumentMoniker": "C:\\Workspace\\tradetool\\Controllers\\BetRecordServiceController.cs",
+              "RelativeDocumentMoniker": "Controllers\\BetRecordServiceController.cs",
+              "ToolTip": "C:\\Workspace\\tradetool\\Controllers\\BetRecordServiceController.cs",
+              "RelativeToolTip": "Controllers\\BetRecordServiceController.cs",
+              "ViewState": "AgIAAGYAAAAAAAAAAIA0wHgAAAAvAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-10T02:11:12.129Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "DashboardData.cs",
+              "DocumentMoniker": "C:\\Workspace\\tradetool\\Models\\DashboardData.cs",
+              "RelativeDocumentMoniker": "Models\\DashboardData.cs",
+              "ToolTip": "C:\\Workspace\\tradetool\\Models\\DashboardData.cs",
+              "RelativeToolTip": "Models\\DashboardData.cs",
+              "ViewState": "AgIAABwAAAAAAAAAAAAUwCkAAABFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-11T23:44:42.009Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
               "Title": "TeamAnalysis.cshtml",
               "DocumentMoniker": "C:\\Workspace\\tradetool\\Views\\Bet\\TeamAnalysis.cshtml",
               "RelativeDocumentMoniker": "Views\\Bet\\TeamAnalysis.cshtml",
@@ -136,7 +168,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 8,
               "Title": "ExcelDataService.cs",
               "DocumentMoniker": "C:\\Workspace\\tradetool\\Helpers\\ExcelDataService.cs",
               "RelativeDocumentMoniker": "Helpers\\ExcelDataService.cs",
@@ -145,18 +177,6 @@
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAEwAAABJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-05-10T03:09:13.833Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 8,
-              "Title": "BetRecordServiceController.cs",
-              "DocumentMoniker": "C:\\Workspace\\tradetool\\Controllers\\BetRecordServiceController.cs",
-              "RelativeDocumentMoniker": "Controllers\\BetRecordServiceController.cs",
-              "ToolTip": "C:\\Workspace\\tradetool\\Controllers\\BetRecordServiceController.cs",
-              "RelativeToolTip": "Controllers\\BetRecordServiceController.cs",
-              "ViewState": "AgIAAFUAAAAAAAAAAAAcwH8AAAAqAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-10T02:11:12.129Z"
             }
           ]
         }

@@ -184,6 +184,7 @@ wwwroot\lib\jquery\LICENSE.txt
 wwwroot\uploads\AccountStatement (1).xlsx
 C:\Workspace\tradetool\wwwroot\css\site.css
 C:\Workspace\tradetool\wwwroot\favicon.ico
+C:\Workspace\tradetool\wwwroot\img\teams\config.xml
 C:\Workspace\tradetool\wwwroot\js\site.js
 C:\Workspace\tradetool\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css
 C:\Workspace\tradetool\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css.map
@@ -244,4 +245,3 @@ C:\Workspace\tradetool\wwwroot\lib\jquery\dist\jquery.slim.js
 C:\Workspace\tradetool\wwwroot\lib\jquery\dist\jquery.slim.min.js
 C:\Workspace\tradetool\wwwroot\lib\jquery\dist\jquery.slim.min.map
 C:\Workspace\tradetool\wwwroot\lib\jquery\LICENSE.txt
-C:\Workspace\tradetool\wwwroot\img\teams\config.xml

@@ -787,203 +787,151 @@ namespace Tradetool.Core
         }
 
         public List<BetRecordData> GetHistory(
-        string? period = null,
-        string? startDate = null,
-        string? endDate = null,
-        string? month = null)
+     string? period = null,
+     string? startDate = null,
+     string? endDate = null,
+     string? month = null)
+        {
+            using var connection = GetConnection();
+
+            connection.Open();
+
+            var sql = @"
+
+    WITH Trades AS
+    (
+        SELECT
+
+            MIN(Id) AS Id,
+
+            MIN(Date) AS Date,
+
+            TargetTeam,
+
+            Home,
+
+            Away,
+
+            MAX(Competition) AS Competition,
+
+            MAX(Market) AS Market,
+
+            MAX(Methods) AS Methods,
+
+            (
+                SELECT Side
+                FROM BetHistory x
+                WHERE
+                    x.Date = b.Date
+                    AND x.Home = b.Home
+                    AND x.Away = b.Away
+                    AND x.Methods = b.Methods
+                ORDER BY x.Odds DESC
+                LIMIT 1
+            ) AS Side,
+
+            (
+                SELECT Odds
+                FROM BetHistory x
+                WHERE
+                    x.Date = b.Date
+                    AND x.Home = b.Home
+                    AND x.Away = b.Away
+                    AND x.Methods = b.Methods
+                ORDER BY x.Odds DESC
+                LIMIT 1
+            ) AS Odds,
+
+            MAX(Responsability) AS StakeReal,
+
+            ROUND(SUM(Amount),2) AS PL
+
+        FROM BetHistory b
+
+        WHERE Methods <> 'COMMISSION'
+
+        GROUP BY
+
+            strftime('%Y-%m-%d %H:%M', Date),
+            TargetTeam,
+            Home,
+            Away,
+            Market,
+            Methods
+    )
+
+    SELECT *
+    FROM Trades
+
+    WHERE PL <> 0
+
+    ORDER BY Date DESC;
+    ";
+
+            using var cmd = connection.CreateCommand();
+
+            cmd.CommandText = sql;
+
+            var list = new List<BetRecordData>();
+
+            using var reader = cmd.ExecuteReader();
+
+            while (reader.Read())
             {
-                using var connection = GetConnection();
-                connection.Open();
+                var stakeReal =
+                    reader["StakeReal"] != DBNull.Value
+                        ? Convert.ToDecimal(reader["StakeReal"])
+                        : 0;
 
-                var sql = @"
+                var lucro =
+                    reader["PL"] != DBNull.Value
+                        ? Convert.ToDecimal(reader["PL"])
+                        : 0;
 
-        WITH Trades AS (
+                decimal roi = 0;
 
-            SELECT
-
-                MAX(Id) AS Id,
-
-                MAX(Date) AS Date,
-
-                TargetTeam,
-
-                Home,
-                Away,
-
-                MAX(Competition) AS Competition,
-
-                MAX(Market) AS Market,
-
-                MAX(Methods) AS Methods,
-
-                MAX(Odds) AS Odds,
-
-                ROUND(
-                    MAX(
-                        CASE
-                            WHEN Side = 'LAY'
-                            THEN Responsability
-                            ELSE 0
-                        END
-                    )
-                ,2) AS Responsabilidade,
-
-                ROUND(
-                    (
-                        MAX(
-                            CASE
-                                WHEN Side = 'LAY'
-                                THEN Responsability
-                                ELSE 0
-                            END
-                        )
-                    )
-                    /
-                    NULLIF(
-                        MAX(Odds) - 1,
-                        0
-                    )
-                ,2) AS StakeEntrada,
-
-                ROUND(
-                    SUM(
-                        CASE
-                            WHEN Side = 'LAY'
-                            THEN Stake
-                            ELSE 0
-                        END
-                    )
-                    -
-                    SUM(
-                        CASE
-                            WHEN Side = 'BACK'
-                            THEN Stake
-                            ELSE 0
-                        END
-                    )
-                ,2) AS Lucro
-
-            FROM BetHistory
-
-            WHERE 1=1
-        ";
-
-                using var cmd = connection.CreateCommand();
-
-                if (period == "week")
+                if (stakeReal > 0)
                 {
-                    sql += " AND Date >= date('now', '-7 day')";
+                    roi = Math.Round(
+                        (lucro / stakeReal) * 100,
+                        2);
                 }
 
-                if (!string.IsNullOrEmpty(month))
+                list.Add(new BetRecordData
                 {
-                    sql += " AND strftime('%Y-%m', Date) = @month";
+                    Id = Convert.ToInt32(reader["Id"]),
 
-                    cmd.Parameters.AddWithValue(
-                        "@month",
-                        month);
-                }
+                    Date = Convert.ToDateTime(reader["Date"]),
 
-                if (!string.IsNullOrEmpty(startDate))
-                {
-                    sql += " AND Date >= @startDate";
+                    TargetTeam = reader["TargetTeam"]?.ToString(),
 
-                    cmd.Parameters.AddWithValue(
-                        "@startDate",
-                        startDate);
-                }
+                    Home = reader["Home"]?.ToString(),
 
-                if (!string.IsNullOrEmpty(endDate))
-                {
-                    sql += " AND Date <= @endDate";
+                    Away = reader["Away"]?.ToString(),
 
-                    cmd.Parameters.AddWithValue(
-                        "@endDate",
-                        endDate + " 23:59:59");
-                }
+                    Competition = reader["Competition"]?.ToString(),
 
-                sql += @"
+                    Market = reader["Market"]?.ToString(),
 
-            GROUP BY
-                strftime('%Y-%m-%d %H:%M', Date),
-                TargetTeam,
-                Home,
-                Away,
-                Market,
-                Methods
-        )
+                    Methods = reader["Methods"]?.ToString(),
 
-        SELECT *
-        FROM Trades
-        WHERE Lucro <> 0
-        ORDER BY Date DESC;
-        ";
+                    Side = reader["Side"]?.ToString(),
 
-                cmd.CommandText = sql;
-
-                var list = new List<BetRecordData>();
-
-                using var reader = cmd.ExecuteReader();
-
-                while (reader.Read())
-                {
-                    var responsabilidade =
-                        reader["Responsabilidade"] != DBNull.Value
-                            ? Convert.ToDecimal(reader["Responsabilidade"])
-                            : 0;
-
-                    var lucro =
-                        reader["Lucro"] != DBNull.Value
-                            ? Convert.ToDecimal(reader["Lucro"])
-                            : 0;
-
-                    decimal roi = 0;
-
-                    if (responsabilidade > 0)
-                    {
-                        roi = Math.Round(
-                            (lucro / responsabilidade) * 100,
-                            2);
-                    }
-
-                    list.Add(new BetRecordData
-                    {
-                        Id = Convert.ToInt32(reader["Id"]),
-
-                        Date = Convert.ToDateTime(reader["Date"]),
-
-                        TargetTeam = reader["TargetTeam"]?.ToString(),
-
-                        Home = reader["Home"]?.ToString(),
-
-                        Away = reader["Away"]?.ToString(),
-
-                        Competition = reader["Competition"]?.ToString(),
-
-                        Market = reader["Market"]?.ToString(),
-
-                        Methods = reader["Methods"]?.ToString(),
-
-                        Side = "LAY",
-
-                        Odds = reader["Odds"] != DBNull.Value
+                    Odds =
+                        reader["Odds"] != DBNull.Value
                             ? Convert.ToDecimal(reader["Odds"])
                             : null,
 
-                        Stake = reader["StakeEntrada"] != DBNull.Value
-                            ? Convert.ToDecimal(reader["StakeEntrada"])
-                            : null,
+                    RealStake = stakeReal,
 
-                        Responsability = responsabilidade,
+                    PL = lucro,
 
-                        PL = lucro,
-
-                        PLStake = roi
-                    });
-                }
-
-                return list;
+                    PLStake = roi
+                });
             }
+
+            return list;
+        }
 
         private List<BetRecordData> GetTeamEntries(
     string? team,

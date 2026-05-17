@@ -22,5 +22,6 @@
         public decimal PercentualResultado { get; set; }
         public string? TargetTeam { get; set; }
         public string? Selection { get; set; }
+        public decimal? RealStake { get; set; }
     }
 }
