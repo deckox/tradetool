@@ -129,6 +129,7 @@
                 <th>Odds</th>
                 <th>Stake Real</th>
                 <th>PL</th>
+                <th>ROI</th>
                 <th>Comentário</th>
             </tr>
         </thead>
@@ -163,6 +164,10 @@
 
                     <td class="@(item.PL >= 0 ? "positive" : "negative")">
                         R$ @item.PL?.ToString("N2")
+                    </td>
+
+                    <td class="@(item.PLStake >= 0 ? "text-success" : "text-danger")">
+                        @item.PLStake?.ToString("N2")%
                     </td>
 
                     <td>@item.Comments</td>
